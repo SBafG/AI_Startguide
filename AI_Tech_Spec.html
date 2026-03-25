@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vad du behöver — AI-portal för analys</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --dark: #0d1e2c; --mid: #1a2e4a; --blue: #0171e3;
+  --gold: #f0b429; --light: #eef3f9; --border: #d0dcea;
+  --muted: #6b7c93; --white: #ffffff; --green: #1a7a4a;
+  --amber: #b8620a; --red: #c0392b; --code-bg: #0f1b26;
+}
+html, body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px; color: var(--mid);
+  background: #dde5f0; min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+.page {
+  max-width: 760px; margin: 40px auto 60px;
+  background: var(--white); border-radius: 12px;
+  box-shadow: 0 4px 40px rgba(0,20,60,0.13); overflow: hidden;
+}
+
+/* HEADER */
+.doc-header { background: #091f2a; padding: 28px 36px 24px; border-bottom: 3px solid var(--gold); }
+.doc-header .eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+.doc-header h1 { font-size: 22px; font-weight: 700; color: var(--white); line-height: 1.25; letter-spacing: -0.02em; }
+.doc-header .subtitle { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 6px; font-style: italic; }
+
+/* CONTENT */
+.content { padding: 36px 36px 48px; }
+.section { margin-bottom: 36px; }
+.section:last-child { margin-bottom: 0; }
+
+h2 {
+  font-size: 15px; font-weight: 700; color: var(--dark);
+  margin-bottom: 16px; padding-bottom: 8px;
+  border-bottom: 2px solid var(--light);
+  display: flex; align-items: center; gap: 8px;
+}
+h2 .cat-icon { font-size: 16px; }
+
+p { font-size: 13px; line-height: 1.7; color: #2a3e58; margin-bottom: 10px; }
+p:last-child { margin-bottom: 0; }
+
+/* COMPONENT CARDS */
+.comp-list { display: flex; flex-direction: column; gap: 10px; margin: 4px 0; }
+.comp-card {
+  border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  display: flex;
+}
+.comp-card-accent { width: 4px; flex-shrink: 0; }
+.comp-card-body { padding: 13px 16px; flex: 1; }
+.comp-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 5px; flex-wrap: wrap; }
+.comp-name { font-size: 13px; font-weight: 700; color: var(--dark); }
+.comp-badges { display: flex; gap: 5px; flex-wrap: wrap; flex-shrink: 0; }
+.badge {
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 2px 7px; border-radius: 20px;
+}
+.badge-free  { background: #e8f5ee; color: var(--green); }
+.badge-paid  { background: #fff3e0; color: var(--amber); }
+.badge-must  { background: #fee; color: var(--red); }
+.badge-opt   { background: var(--light); color: var(--muted); }
+.badge-ms    { background: #e8f0fe; color: #1a56cc; }
+.comp-desc { font-size: 12px; color: #3a5068; line-height: 1.55; margin-bottom: 8px; }
+.comp-search {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10.5px; color: var(--muted);
+  background: var(--light); border-radius: 5px; padding: 3px 9px;
+  font-family: 'Courier New', monospace;
+}
+.comp-search::before { content: '🔍'; font-size: 10px; }
+
+/* HIGHLIGHT BOX */
+.highlight-box {
+  background: #fffbf0; border-left: 4px solid var(--gold);
+  border-radius: 0 8px 8px 0; padding: 14px 16px; margin: 14px 0;
+  font-size: 13px; line-height: 1.6; color: var(--dark);
+}
+
+/* STACK OVERVIEW */
+.stack-table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 12px; }
+.stack-table th {
+  background: var(--light); padding: 8px 12px; text-align: left;
+  font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--muted); border-bottom: 1px solid var(--border);
+}
+.stack-table td { padding: 9px 12px; border-bottom: 1px solid #f0f4f8; color: #2a3e58; vertical-align: top; }
+.stack-table tr:last-child td { border-bottom: none; }
+.stack-table td:first-child { font-weight: 600; color: var(--dark); white-space: nowrap; }
+.stack-table td.cost { text-align: right; font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+/* CTA */
+.cta-box { background: var(--dark); border-radius: 10px; padding: 22px 24px; margin-top: 14px; }
+.cta-box h3 { font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 10px; }
+.cta-steps { counter-reset: cta; }
+.cta-steps li {
+  counter-increment: cta; font-size: 12.5px; line-height: 1.6;
+  color: rgba(255,255,255,0.75); padding: 4px 0 4px 26px;
+  position: relative; list-style: none;
+}
+.cta-steps li::before {
+  content: counter(cta); position: absolute; left: 0;
+  background: var(--gold); color: var(--dark); font-size: 9px; font-weight: 700;
+  width: 16px; height: 16px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; top: 6px;
+}
+
+/* FOOTER */
+.doc-footer {
+  background: var(--light); border-top: 1px solid var(--border);
+  padding: 14px 36px; font-size: 11px; color: var(--muted);
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+}
+.doc-footer a { color: var(--blue); text-decoration: none; }
+
+@media (max-width: 600px) {
+  .page { margin: 0; border-radius: 0; }
+  .content, .doc-header { padding: 24px 20px; }
+  .doc-footer { padding: 14px 20px; flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="doc-header">
+    <div class="eyebrow">Teknisk spec</div>
+    <h1>Vad du behöver för att bygga en AI-portal</h1>
+    <div class="subtitle">Komponenter, verktyg och söktermer — för en analytiker som vill komma igång</div>
+  </div>
+
+  <div class="content">
+
+    <!-- INTRO -->
+    <div class="section">
+      <p>Det här är en praktisk komponentlista för den som vill bygga ett AI-drivet analysstöd — typ en intern portal där data hämtas, AI bearbetar den och resultatet visas. Varje komponent har en sökterm du kan googla på för att lära dig mer.</p>
+
+      <div class="highlight-box">
+        Du behöver inte allt på en gång. Börja med de tre som är märkta <strong style="color:var(--red);">NÖDVÄNDIG</strong> — resten lägger du till när du ser behovet.
+      </div>
+    </div>
+
+    <!-- UTVECKLINGSMILJÖ -->
+    <div class="section">
+      <h2><span class="cat-icon">🖥️</span> Utvecklingsmiljö</h2>
+      <div class="comp-list">
+
+        <div class="comp-card">
+          <div class="comp-card-accent" style="background:#0171e3;"></div>
+          <div class="comp-card-body">
+            <div class="comp-top">
+              <div class="comp-name">VS Code</div>
+              <div class="comp-badges"><span class="badge badge-free">Gratis</span><span class="badge badge-must">Nödvändig</span></div>
+            </div>
+            <div class="comp-desc">Din arbetsyta. Textredigerare från Microsoft där du skriver och kör kod. Kan byggas ut med tillägg (extensions). Fungerar för HTML, JavaScript, Python och mer.</div>
+            <div class="comp-search">Visual Studio Code download</div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="comp-card-accent" style="background:#f0b429;"></div>
+          <div class="comp-card-body">
+            <div class="comp-top">
+              <div class="comp-name">Claude Code</div>
+              <div class="comp-badges"><span class="badge badge-paid">Betald</span><span class="badge badge-must">Nödvändig</span></div>
+            </div>
+            <div class="comp-desc">AI-assistent som sitter direkt i VS Code. Du beskriver vad du vill bygga — Claude skriver koden, förklarar den och felsöker. Det är det här verktyget som gör att du kan bygga utan att kunna programmera.</div>
+            <div class="comp-search">Claude Code VS Code extension Anthropic</div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="comp-card-accent" style="background:#1a7a4a;"></div>
+          <div class="comp-card-body">
+            <div class="comp-top">
+              <div class="comp-name">Node.js</div>
+              <div class="comp-badges"><span class="badge badge-free">Gratis</span><span class="badge badge-must">Nödvändig</span></div>
+            </div>
+            <div class="comp-desc">Kör JavaScript-kod på din dator (utanför webbläsaren). Behövs för att läsa filer, anropa API:er, schemalägga jobb och bygga backend-scripts. Installeras en gång, används hela tiden.</div>
+            <div class="comp-search">Node.js download LTS</div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="comp-card-accent" style="background:#6b7c93;"></div>
+          <div class="comp-card-body">
+            <div class="comp-top">
+              <div class="comp-name">Git + GitHub</div>
+              <div class="comp-badges"><span class="badge badge-free">Gratis</span><span class="badge badge-opt">Rekommenderas</span></div>
+            </div>
+            <div class="comp-desc">Versionshantering — sparar historik på alla ändringar och låter dig återställa om något går fel. GitHub är molntjänsten där koden lagras. Används också för att publicera webbsidor via GitHub Pages.</div>
+            <div class="comp-search">Git for Windows download</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- AI-MODELLER -->
+    <div class="section">
+      <h2><span class="cat-icon">🤖</span> AI-modeller &amp; API</h2>
+      <div class="comp-list">
+
+        <div class="comp-card">
+          <div class="comp-card-accent" style="background:#f0b429;"></div>
+          <div class="comp-card-body">
+            <div class="comp-top">
+              <div class="comp-name">Anthropic API (Claude)</div>
+              <div class="comp-badges"><span class="badge badge-paid">Betald per användning</span><span class="badge badge-must">Nödvändig</span></div>
+            </div>
+            <div class="comp-desc">Det är via detta API ditt script pratar med Claude. Du betalar per token (ungefär per ord). En månadsrapport kostar under 1 kr. Välj modell efter behov: <strong>Haiku</strong> = snabb &amp; billig, <strong>Sonnet</strong> = balanserad, <strong>Opus</strong> = mest kraftfull.</div>
+            <div class="comp-search">Anthropic API console Claude models pricing</div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="comp-card-accent" style="background:#1a56cc;"></div>
+          <div class="comp-card-body">
+            <div class="comp-top">
+              <div class="comp-name">Microsoft Copilot</div>
+              <div class="comp-badges"><span class="badge badge-ms">Microsoft 365</span><span class="badge badge-opt">Tillval</span></div>
+            </div>
+            <div class="comp-desc">AI inbyggd i Word, Excel, Teams och Outlook. Bra för enstaka dokumentuppgifter direkt i Office — men ger dig inte samma kontroll som ett eget script mot Claude API. Kräver Copilot-licens (~4 400 kr/år/användare).</div>
+            <div class="comp-search">Microsoft 365 Copilot licens pris</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DATA & LAGRING -->
+    <div class="section">
+      <h2><span class="cat-icon">🗄️</span> Data &amp; lagring</h2>
+      <div class="comp-list">
+
+        <div class="comp-card">
+          <div class="comp-card-accent" style="background:#1a56cc;"></div>
+          <div class="comp-card-body">
+            <div class="comp-top">
+              <div class="comp-name">SharePoint / SharePoint Lists</div>
+              <div class="comp-badges"><span class="badge badge-ms">Microsoft 365</span><span class="badge badge-opt">Rekommenderas</span></div>
+            </div>
+            <div class="comp-desc">Microsofts dokumentlagring och listtjänst. Fungerar utmärkt som databas för portalen — t.ex. för att lagra ärenden, kunskapsartiklar eller rapporter. Kan läsas och skrivas via Graph API. Ingår i de flesta M365-licenser.</div>
+            <div class="comp-search">SharePoint Lists REST API Microsoft Graph</div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="comp-card-accent" style="background:#6b7c93;"></div>
+          <div class="comp-card-body">
+            <div class="comp-top">
+              <div class="comp-name">CSV / Excel-export</div>
+              <div class="comp-badges"><span class="badge badge-free">Gratis</span></div>
+            </div>
+            <div class="comp-desc">Den enklaste datakällan — en fil som ditt portföljsystem eller annat internsystem exporterar. Scriptet läser filen direkt. Ingen databas, ingen integration behövs för att komma igång.</div>
+            <div class="comp-search">Node.js read CSV file parse</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- AUTOMATISERING -->
+    <div class="section">
+      <h2><span class="cat-icon">⚙️</span> Automatisering &amp; triggers</h2>
+      <div class="comp-list">
+
+        <div class="comp-card">
+          <div class="comp-card-accent" style="background:#1a56cc;"></div>
+          <div class="comp-card-body">
+            <div class="comp-top">
+              <div class="comp-name">Power Automate</div>
+              <div class="comp-badges"><span class="badge badge-ms">Microsoft 365</span><span class="badge badge-opt">Rekommenderas</span></div>
+            </div>
+            <div class="comp-desc">Microsofts automatiseringsverktyg — bygger flöden utan kod. Kan triggas av en ny fil i SharePoint, ett mail, ett schema eller en HTTP-förfrågan. Bra för att koppla ihop Office-tjänster med ditt script.</div>
+            <div class="comp-search">Power Automate HTTP trigger SharePoint flow</div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="comp-card-accent" style="background:#1a7a4a;"></div>
+          <div class="comp-card-body">
+            <div class="comp-top">
+              <div class="comp-name">PM2</div>
+              <div class="comp-badges"><span class="badge badge-free">Gratis</span><span class="badge badge-opt">Rekommenderas</span></div>
+            </div>
+            <div class="comp-desc">Processhanterare för Node.js. Låter dina scripts köra som bakgrundstjänster — startar om automatiskt vid fel och efter omstart av datorn. Enklaste sättet att hålla en filbevakning igång.</div>
+            <div class="comp-search">PM2 process manager Node.js background service</div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="comp-card-accent" style="background:#6b7c93;"></div>
+          <div class="comp-card-body">
+            <div class="comp-top">
+              <div class="comp-name">Windows Task Scheduler</div>
+              <div class="comp-badges"><span class="badge badge-free">Gratis · Inbyggd i Windows</span></div>
+            </div>
+            <div class="comp-desc">Schemalägg ett script att köras vid en viss tid — t.ex. varje måndag 08:00. Inget att installera. Enklaste sättet att automatisera utan tredjepartsverktyg.</div>
+            <div class="comp-search">Windows Task Scheduler run script scheduled</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PUBLICERING -->
+    <div class="section">
+      <h2><span class="cat-icon">🌐</span> Publicering &amp; portal</h2>
+      <div class="comp-list">
+
+        <div class="comp-card">
+          <div class="comp-card-accent" style="background:#1a56cc;"></div>
+          <div class="comp-card-body">
+            <div class="comp-top">
+              <div class="comp-name">Azure Static Web Apps</div>
+              <div class="comp-badges"><span class="badge badge-free">Gratis nivå finns</span><span class="badge badge-opt">Rekommenderas</span></div>
+            </div>
+            <div class="comp-desc">Microsofts hosting för statiska webbsidor. Kopplas direkt till GitHub — varje push till main-branchen deployas automatiskt på ~2 minuter. Stödjer Microsoft-inloggning (Entra ID) så att portalen skyddas bakom era M365-konton.</div>
+            <div class="comp-search">Azure Static Web Apps GitHub deploy Entra ID authentication</div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="comp-card-accent" style="background:#1a7a4a;"></div>
+          <div class="comp-card-body">
+            <div class="comp-top">
+              <div class="comp-name">GitHub Pages</div>
+              <div class="comp-badges"><span class="badge badge-free">Gratis</span></div>
+            </div>
+            <div class="comp-desc">Enklaste sättet att publicera HTML-sidor offentligt — precis som den här guiden. Inga inloggningsskydd, men perfekt för demos och guider utan känslig data. Driftsätts automatiskt från GitHub-repot.</div>
+            <div class="comp-search">GitHub Pages enable publish HTML</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- AVANCERAT -->
+    <div class="section">
+      <h2><span class="cat-icon">🔧</span> Avancerat — när du är redo</h2>
+      <div class="comp-list">
+
+        <div class="comp-card">
+          <div class="comp-card-accent" style="background:#b8620a;"></div>
+          <div class="comp-card-body">
+            <div class="comp-top">
+              <div class="comp-name">MCP — Model Context Protocol</div>
+              <div class="comp-badges"><span class="badge badge-free">Öppen standard</span><span class="badge badge-opt">Avancerat</span></div>
+            </div>
+            <div class="comp-desc">Ett protokoll från Anthropic som låter Claude prata direkt med externa system — t.ex. din databas, ditt portföljsystem eller ett internt API. Gör att AI kan hämta och skriva data i realtid utan att du manuellt exporterar filer.</div>
+            <div class="comp-search">Model Context Protocol MCP Anthropic Claude tools</div>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <div class="comp-card-accent" style="background:#b8620a;"></div>
+          <div class="comp-card-body">
+            <div class="comp-top">
+              <div class="comp-name">Microsoft Graph API</div>
+              <div class="comp-badges"><span class="badge badge-ms">Microsoft 365</span><span class="badge badge-opt">Avancerat</span></div>
+            </div>
+            <div class="comp-desc">API som ger ditt script tillgång till hela M365 — läsa SharePoint-listor, hämta användarinfo från Entra ID, skicka mail via Outlook, läsa Teams-meddelanden. Standardsättet att integrera med Microsofts ekosystem.</div>
+            <div class="comp-search">Microsoft Graph API JavaScript SDK getting started</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- KOSTNADSÖVERSIKT -->
+    <div class="section">
+      <h2><span class="cat-icon">💰</span> Kostnadsöversikt</h2>
+      <table class="stack-table">
+        <thead>
+          <tr>
+            <th>Komponent</th>
+            <th>Kostnad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>VS Code</td><td class="cost">Gratis</td></tr>
+          <tr><td>Node.js, Git, PM2</td><td class="cost">Gratis</td></tr>
+          <tr><td>GitHub + GitHub Pages</td><td class="cost">Gratis</td></tr>
+          <tr><td>Azure Static Web Apps (fri nivå)</td><td class="cost">Gratis</td></tr>
+          <tr><td>Claude Code (VS Code-tillägg)</td><td class="cost">~$20/mån (Anthropic Pro)</td></tr>
+          <tr><td>Claude API — månadsrapport (Haiku)</td><td class="cost">&lt; 1 kr/rapport</td></tr>
+          <tr><td>Claude API — tung analys (Opus)</td><td class="cost">~5–20 kr/körning</td></tr>
+          <tr><td>Microsoft 365 (om ni redan har)</td><td class="cost">Ingår i befintlig licens</td></tr>
+          <tr><td>Microsoft Copilot-licens</td><td class="cost">~4 400 kr/år/person</td></tr>
+        </tbody>
+      </table>
+      <p>Minsta möjliga setup för att testa (VS Code + Claude Code + Node.js) kostar under 200 kr/mån.</p>
+    </div>
+
+    <!-- CTA -->
+    <div class="section">
+      <div class="cta-box">
+        <h3>Ordningen att googla på</h3>
+        <ol class="cta-steps">
+          <li>Ladda ner <strong style="color:white;">VS Code</strong> + <strong style="color:white;">Node.js</strong></li>
+          <li>Skapa konto på <strong style="color:white;">console.anthropic.com</strong> — hämta API-nyckel</li>
+          <li>Installera <strong style="color:white;">Claude Code extension</strong> i VS Code</li>
+          <li>Googla: <em style="color:rgba(255,255,255,0.6);">"Node.js read CSV file and call REST API"</em></li>
+          <li>Googla: <em style="color:rgba(255,255,255,0.6);">"Anthropic SDK JavaScript quickstart"</em></li>
+          <li>Googla: <em style="color:rgba(255,255,255,0.6);">"Azure Static Web Apps deploy from GitHub"</em></li>
+          <li>Googla: <em style="color:rgba(255,255,255,0.6);">"PM2 Node.js background service Windows"</em></li>
+        </ol>
+      </div>
+    </div>
+
+  </div><!-- /.content -->
+
+  <div class="doc-footer">
+    <span>← <a href="index.html">Alla guider</a></span>
+    <span>Skapat med Claude Code &nbsp;·&nbsp; claude.ai</span>
+  </div>
+
+</div>
+</body>
+</html>
